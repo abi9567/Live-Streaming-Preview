@@ -50,7 +50,6 @@ import com.abi.livestreamingtest.ui.theme.DarkGreyColor
 import com.abi.livestreamingtest.ui.theme.LiveColor
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 
