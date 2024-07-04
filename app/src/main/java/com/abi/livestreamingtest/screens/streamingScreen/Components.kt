@@ -2,15 +2,11 @@ package com.abi.livestreamingtest.screens.streamingScreen
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateValue
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -51,75 +49,79 @@ import com.abi.livestreamingtest.ui.theme.DarkGreyColor
 import com.abi.livestreamingtest.ui.theme.LiveColor
 
 @Composable
-fun CurrentProfileLiveView() {
-    val infiniteTransition = rememberInfiniteTransition(label = "Infinite Transition")
-    val liveIconSizeAnimation by infiniteTransition.animateValue(
-        label = "Icon Size Animation",
-        initialValue = 8.dp,
-        targetValue = 11.dp,
-        typeConverter = Dp.VectorConverter,
-        animationSpec = infiniteRepeatable(
-            repeatMode = RepeatMode.Reverse,
-            animation = tween(durationMillis = 900)))
-
-    Row(modifier = Modifier
-        .padding(all = 16.dp)
-        .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.height(height = 24.dp))
-
-        Image(painter = painterResource(id = R.drawable.user_image),
-            modifier = Modifier
-                .size(38.dp)
-                .clip(shape = CircleShape),
-            contentDescription = null)
-
-        Spacer(modifier = Modifier.width(width = 8.dp))
-
-        Text(text = "Abijith",
-            modifier = Modifier
-                .weight(weight = 1F)
-                .fillMaxWidth(),
-            fontWeight = W600,
-            color = Color.White,
-            fontSize = 16.sp)
-
-        Spacer(modifier = Modifier.width(width = 8.dp))
-
-
+fun CurrentProfileLiveAndControlsView(liveIconSizeAnimation : Dp,
+                                      isMicrophoneON : Boolean,
+                                      onMicroPhoneClick: () -> Unit,
+                                      onCameraSwitchClick: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier
-            .background(color = LiveColor, shape = RoundedCornerShape(size = 8.dp))
-            .padding(horizontal = 8.dp),
+            .padding(all = 16.dp)
+            .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier
-                .clip(shape = CircleShape)
-                .background(color = Color.White)
-                .size(size = liveIconSizeAnimation))
+            Spacer(modifier = Modifier.height(height = 24.dp))
 
-            Spacer(modifier = Modifier.width(width = 4.dp))
-            Text(text = "Live",
+            Image(painter = painterResource(id = R.drawable.user_image),
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(shape = CircleShape),
+                contentDescription = null)
+
+            Spacer(modifier = Modifier.width(width = 8.dp))
+
+            Text(text = "Abijith",
+                modifier = Modifier
+                    .weight(weight = 1F)
+                    .fillMaxWidth(),
+                fontWeight = W600,
                 color = Color.White,
-                fontSize = 12.sp)
+                fontSize = 16.sp)
+
+            Spacer(modifier = Modifier.width(width = 8.dp))
+
+
+            Row(modifier = Modifier
+                .background(color = LiveColor, shape = RoundedCornerShape(size = 8.dp))
+                .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier
+                    .clip(shape = CircleShape)
+                    .background(color = Color.White)
+                    .size(size = liveIconSizeAnimation))
+
+                Spacer(modifier = Modifier.width(width = 4.dp))
+                Text(text = "Live",
+                    color = Color.White,
+                    fontSize = 12.sp)
+            }
+
+            Spacer(modifier = Modifier.width(width = 8.dp))
+
+            Text(text = "4.2k",
+                modifier = Modifier,
+                fontWeight = W600,
+                color = Color.White,
+                fontSize = 13.sp)
         }
 
-        Spacer(modifier = Modifier.width(width = 8.dp))
+        VideoControlsView(modifier = Modifier.align(alignment = Alignment.End),
 
-        Text(text = "4.2k",
-            modifier = Modifier,
-            fontWeight = W600,
-            color = Color.White,
-            fontSize = 13.sp)
+            onMicroPhoneClick = onMicroPhoneClick,
+            isMicrophoneON = isMicrophoneON,
+            onCameraSwitchClick = onCameraSwitchClick
+        )
     }
+
+
 }
 
 @Composable
 fun CameraAndroidView(cameraController : LifecycleCameraController) {
     AndroidView(
         modifier = Modifier.fillMaxSize(),
-        factory = { ctx ->
-            PreviewView(ctx).apply {
+        factory = { context ->
+            PreviewView(context).apply {
                 scaleType = PreviewView.ScaleType.FILL_START
                 implementationMode = PreviewView.ImplementationMode.COMPATIBLE
                 controller = cameraController
@@ -132,39 +134,80 @@ fun CameraAndroidView(cameraController : LifecycleCameraController) {
 }
 
 @Composable
-fun CommentView(modifier : Modifier) {
+fun CommentView(modifier : Modifier,
+                onLiveEndClick : () -> Unit) {
 
     var text by remember { mutableStateOf(value = "") }
     val focusManager = LocalFocusManager.current
 
-    OutlinedTextField(value = text,
-        modifier = modifier.padding(all = 20.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = DarkGreyColor,
-            unfocusedContainerColor = DarkGreyColor,
-            unfocusedBorderColor = Color.Transparent,
-            focusedBorderColor = Color.Transparent
-        ),
-        maxLines = 1,
-        shape = RoundedCornerShape(size = 16.dp),
-        textStyle = TextStyle(
-            fontSize = 14.sp,
-            color = Color.White
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        placeholder = {
-            Text(text = "Say Something!!!",
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .padding(all = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        OutlinedTextField(value = text,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = DarkGreyColor,
+                unfocusedContainerColor = DarkGreyColor,
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent
+            ),
+            maxLines = 1,
+            shape = RoundedCornerShape(size = 16.dp),
+            textStyle = TextStyle(
                 fontSize = 14.sp,
                 color = Color.White
-            )
-        },
-        trailingIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(painter = painterResource(id = R.drawable.ic_send),
-                    tint = Color.Unspecified,
-                    contentDescription = null)
-            }
-        },
-        onValueChange = { text = it })
+            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            placeholder = {
+                Text(text = "Say Something!!!",
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
+            },
+            trailingIcon = {
+                IconButton(onClick = { focusManager.clearFocus() }) {
+                    Icon(painter = painterResource(id = R.drawable.ic_send),
+                        tint = Color.Unspecified,
+                        contentDescription = null)
+                }
+            },
+            onValueChange = { text = it })
+
+        Spacer(modifier = Modifier.fillMaxWidth().weight(weight = 1F))
+
+        IconButton(onClick = onLiveEndClick,
+            modifier = Modifier.background(color = DarkGreyColor, shape = CircleShape)
+        ) {
+            Icon(imageVector = Icons.Default.Close,
+                contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun VideoControlsView(modifier : Modifier,
+                      isMicrophoneON : Boolean,
+                      onMicroPhoneClick : () -> Unit,
+                      onCameraSwitchClick : () -> Unit) {
+
+    Column(verticalArrangement = Arrangement.Center,
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(onClick = onMicroPhoneClick) {
+            Icon(painter = painterResource(id = if (isMicrophoneON) R.drawable.ic_microphone else R.drawable.no_mircrophone),
+                tint = Color.White,
+                contentDescription = null)
+        }
+
+        IconButton(onClick = onCameraSwitchClick) {
+            Icon(painter = painterResource(id = R.drawable.ic_switch_camera),
+                modifier = Modifier.size(size = 20.dp),
+                tint = Color.Unspecified,
+                contentDescription = null)
+        }
+    }
 }
