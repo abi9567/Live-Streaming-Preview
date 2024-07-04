@@ -1,5 +1,6 @@
 package com.abi.livestreamingtest.screens.streamingScreen
 
+import androidx.annotation.RawRes
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
@@ -47,6 +48,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.abi.livestreamingtest.R
 import com.abi.livestreamingtest.ui.theme.DarkGreyColor
 import com.abi.livestreamingtest.ui.theme.LiveColor
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
 fun CurrentProfileLiveAndControlsView(liveIconSizeAnimation : Dp,
@@ -176,7 +182,9 @@ fun CommentView(modifier : Modifier,
             },
             onValueChange = { text = it })
 
-        Spacer(modifier = Modifier.fillMaxWidth().weight(weight = 1F))
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .weight(weight = 1F))
 
         IconButton(onClick = onLiveEndClick,
             modifier = Modifier.background(color = DarkGreyColor, shape = CircleShape)
@@ -210,4 +218,28 @@ fun VideoControlsView(modifier : Modifier,
                 contentDescription = null)
         }
     }
+}
+
+@Composable
+fun LottieAnimationView(modifier: Modifier = Modifier,
+                        onCompletion : () -> Unit,
+                        @RawRes file : Int) {
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(file))
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1)
+
+    if (progress == 1F) {
+        onCompletion()
+    }
+
+    LottieAnimation(
+        modifier = modifier,
+        composition = composition,
+        progress = { progress },
+    )
+
 }

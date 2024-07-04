@@ -10,7 +10,7 @@ import com.abi.livestreamingtest.screens.homeScreen.HomeScreen
 @Composable
 fun NavigationGraph(navController : NavHostController) {
 
-    NavHost(navController = navController, startDestination = Screen.StreamingScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
 
         composable(route = Screen.HomeScreen.route) {
             HomeScreen(navController = navController)
